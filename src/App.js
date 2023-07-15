@@ -1,24 +1,38 @@
 import setupSdk from "@matterport/sdk";
 import { useState, useRef, useEffect } from "react";
 import { hotspots } from "./hotspots";
+import Iframe from "./UI/Iframe";
+import "./App.css";
 
 function App() {
 	const [sdk, setSdk] = useState();
 	const [isLoaded, setIsLoaded] = useState(false);
 	const container = useRef();
+	const [iframe, setIframe] = useState();
 	let started = false;
-	useEffect(() => {
-		if (!started && container.current) {
-			started = true;
-			setupSdk("prigk78dz4crrmb7p98czk0kc", {
-				container: container.current,
-				space: "eE6srFdgFSR",
-				iframeQueryParams: { qs: 1 },
-			})
-				.then(setSdk)
-				.then(setIsLoaded(false));
+	const showCaseLoaded = async () => {
+		const showcase = document.getElementById("showcase");
+		const key = "w78qr7ncg7npmnhwu1xi07yza";
+		try {
+			const rtvSDK = await showcase.contentWindow.MP_SDK.connect(
+				showcase,
+				key,
+				"3.6"
+			);
+			setSdk(rtvSDK);
+		} catch (e) {
+			console.error(e);
+			return;
 		}
-	}, []);
+		sdk?.App.state.waitUntil((state) => {
+			console.log(state);
+			if (state.phase == "appphase.playing") {
+				return true;
+			} else {
+				return false;
+			}
+		});
+	};
 	useEffect(() => {
 		loaded().then(
 			sdk?.App.state.waitUntil((state) =>
@@ -66,8 +80,11 @@ function App() {
 					z: e.positionZ,
 				},
 				stemVector: { x: e.stemVectorX, y: e.stemVectorY, z: e.stemVectorZ },
-				mediaType: e.type,
-				mediaSrc: e.url,
+				media: {
+					type: e.type,
+					src: e.url,
+				},
+				// color: "#FFFF00",
 			});
 		});
 		sdk.Mattertag.add(matterTags).then(function (mattertagIds) {
@@ -77,7 +94,22 @@ function App() {
 
 	return (
 		<>
-			<div className='container' ref={container}></div>
+			<div className='container' ref={container}>
+				{iframe && <Iframe title={iframe.title} message={iframe.message} />}
+				<iframe
+					id='showcase'
+					src='/bundle/showcase.html?m=V5hx2ktRhvH&play=1&qs=1&log=0&applicationKey=w78qr7ncg7npmnhwu1xi07yza'
+					width='1200px'
+					height='800px'
+					frameBorder='0'
+					allow='xr-spatial-tracking'
+					allowFullScreen
+					ref={container}
+					onLoad={showCaseLoaded}
+				>
+					{" "}
+				</iframe>
+			</div>
 		</>
 	);
 }

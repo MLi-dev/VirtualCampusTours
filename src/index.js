@@ -1,8 +1,8 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
+import * as ReactDOMCLIENT from "react-dom/client";
 import "./index.css";
 import App from "./App";
-import AppBundle from "./AppBundle";
+// import AppBundle from "./AppBundle";
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
+const root = ReactDOMCLIENT.createRoot(document.getElementById("root"));
 root.render(<React.StrictMode>{<App />}</React.StrictMode>);
