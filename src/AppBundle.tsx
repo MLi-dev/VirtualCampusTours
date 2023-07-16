@@ -172,10 +172,12 @@ function AppBundle() {
 					z: e.positionZ,
 				},
 				stemVector: { x: e.stemVectorX, y: e.stemVectorY, z: e.stemVectorZ },
+				mediaType: e.type,
+				mediaSrc: e.url,
 				media: {
-					type: e.type,
+					type: "mattertag.media." + e.type,
 					src: e.url,
-				},
+				}
 			});
 			return 0;
 		}
@@ -189,7 +191,6 @@ function AppBundle() {
 					for (let i = 0; i < matterTags.length; i++) {
 						isMobile ? sdk.Mattertag.registerIcon(`${mattertags[i].sid}1`, icon1) : sdk.Mattertag.registerIcon(`${mattertags[i].sid}1`, icon2);
 						sdk.Mattertag.editIcon(mattertags[i].sid, `${mattertags[i].sid}1`);
-
 					}
 
 				}).catch(function (error) {
@@ -204,7 +205,7 @@ function AppBundle() {
 	};
 	return (
 		<>
-			<div id="text" class="hidden"></div>
+			<div id="text" className="hidden"></div>
 			<div className='container'>
 				{iframe && (
 					<Iframe
