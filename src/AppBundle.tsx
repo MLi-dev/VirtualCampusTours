@@ -65,6 +65,15 @@ function AppBundle() {
 			(state) => state.phase === sdk.App.Phase.PLAYING
 		);
 	}
+	function setMessage(element: HTMLDivElement, message: string) {
+		element.classList.remove('hidden');
+		element.classList.add('visible');
+		element.innerText = message;
+	}
+	function clearMesssage(element: HTMLDivElement) {
+		element.classList.remove('visible');
+		element.classList.add('hidden');
+	}
 	const initialFunction = async () => {
 		const [sceneObject] = await sdk.Scene.createObjects(1);
 		// add light
@@ -105,14 +114,16 @@ function AppBundle() {
 		parrotComponent?.spyOnEvent(new ClickSpy());
 		modelNode.start();
 
-		const tick = function () {
-			requestAnimationFrame(tick);
-			modelNode.obj3D.rotation.z += 0.002;
-		};
-		tick();
+		// const tick = function () {
+		// 	requestAnimationFrame(tick);
+		// 	//modelNode.setAttribute('animation-mixer', 'clip: idle ; timeScale:1')
+		// 	//modelNode.obj3D.setRotationFromAxisAngle(0);
+		// 	modelNode.obj3D.rotation.z += 0.002;
+		// };
+		// tick();
 
 		// add sensor
-		const textElement = document.getElementById("showcase");
+		const textElement = document.getElementById("text");
 		const sensor = await sdk.Sensor.createSensor(sdk.Sensor.SensorType.CAMERA);
 		sensor.showDebug(true);
 		sensor.readings.subscribe({
@@ -134,11 +145,9 @@ function AppBundle() {
 				}
 
 				if (inRange.length > 0) {
-					alert("I am in");
-					console.log("I am in range");
-					textElement.append(`<div>hello</div>`); // setMessage(textElement, "hello");
+					setMessage(textElement, inRange.toString());
 				} else {
-					console.log("I am out of range"); //clearMesssage(textElement);
+					clearMesssage(textElement);
 				}
 			},
 		});
@@ -195,6 +204,7 @@ function AppBundle() {
 	};
 	return (
 		<>
+			<div id="text" class="hidden"></div>
 			<div className='container'>
 				{iframe && (
 					<Iframe
