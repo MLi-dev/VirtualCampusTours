@@ -1,5 +1,4 @@
 // @ts-nocheck
-import setupSdk from "@matterport/sdk";
 import { useState, useRef, useEffect } from "react";
 import { hotspots } from "./hotspots";
 import Iframe from "./UI/Iframe";
@@ -14,7 +13,6 @@ function AppBundle() {
 	const [iframe, setIframe] = useState();
 	const container = useRef();
 	const isMobile = window.matchMedia("(min-width: 768px)").matches;
-	let started = false;
 	const showCaseLoaded = async () => {
 		const showcase = document.getElementById("showcase");
 		const key = "prigk78dz4crrmb7p98czk0kc";
@@ -31,13 +29,14 @@ function AppBundle() {
 		}
 		sdk?.App.state.waitUntil((state) => {
 			console.log(state);
-			if (state.phase == "appphase.playing") {
+			if (state.phase === "appphase.playing") {
 				return true;
 			} else {
 				return false;
 			}
 		});
 	};
+	// eslint-disable-next-line
 	useEffect(() => {
 		loaded().then(
 			sdk?.App.state.waitUntil((state) =>
@@ -46,12 +45,16 @@ function AppBundle() {
 					: console.log(state.phase)
 			)
 		);
-	}, [sdk]);
+	}, 		// eslint-disable-next-line
+		[sdk]);
+
 	useEffect(() => {
 		if (isLoaded) {
 			startSDKHere();
 		}
-	}, [isLoaded]);
+	},
+		// eslint-disable-next-line 
+		[isLoaded]);
 	const startSDKHere = () => {
 		addMattertagNode1();
 		initialFunction();
@@ -149,18 +152,6 @@ function AppBundle() {
 		sensor.addSource(...sources);
 	};
 	const addMattertagNode1 = () => {
-		let matterTagDesc = {
-			label: "(1/8) Meet your tour guide!",
-			description: "",
-			anchorPosition: {
-				x: -33.32117261846476,
-				y: 1.1582876760621081,
-				z: -24.18207994942,
-			},
-			stemVector: { x: 0, y: 0.3, z: 0 },
-			mediaType: "video",
-			mediaSrc: "https://youtu.be/6DP3aZY1woQ",
-		};
 		let matterTags = [];
 		hotspots.map((e) => {
 			matterTags.push({
@@ -177,7 +168,9 @@ function AppBundle() {
 					src: e.url,
 				},
 			});
-		});
+			return 0;
+		}
+		);
 		// @ts-ignore 
 		sdk.Mattertag.add(matterTags).then(function (mattertagIds) {
 			console.log(mattertagIds);
@@ -214,6 +207,7 @@ function AppBundle() {
 				)}
 				<iframe
 					id='showcase'
+					title='showcase_frame'
 					src='/bundle/showcase.html?m=eE6srFdgFSR&play=1&qs=1&log=0&applicationKey=prigk78dz4crrmb7p98czk0kc'
 					width='1200px'
 					height='800px'
