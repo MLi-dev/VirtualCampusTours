@@ -1,16 +1,18 @@
-import setupSdk from "@matterport/sdk";
+// @ts-nocheck
 import { useState, useRef, useEffect } from "react";
 import { hotspots } from "./hotspots";
 import Iframe from "./UI/Iframe";
 import "./App.css";
 import sourceDescs from "./sources.json";
+import icon2 from './images/big1.jpg';
+import icon1 from './images/icon1.png';
 
 function AppBundle() {
 	const [sdk, setSdk] = useState();
 	const [isLoaded, setIsLoaded] = useState(false);
 	const [iframe, setIframe] = useState();
 	const container = useRef();
-	let started = false;
+	const isMobile = window.matchMedia("(min-width: 768px)").matches;
 	const showCaseLoaded = async () => {
 		const showcase = document.getElementById("showcase");
 		const key = "prigk78dz4crrmb7p98czk0kc";
@@ -27,13 +29,14 @@ function AppBundle() {
 		}
 		sdk?.App.state.waitUntil((state) => {
 			console.log(state);
-			if (state.phase == "appphase.playing") {
+			if (state.phase === "appphase.playing") {
 				return true;
 			} else {
 				return false;
 			}
 		});
 	};
+	// eslint-disable-next-line
 	useEffect(() => {
 		loaded().then(
 			sdk?.App.state.waitUntil((state) =>
@@ -42,12 +45,16 @@ function AppBundle() {
 					: console.log(state.phase)
 			)
 		);
-	}, [sdk]);
+	}, 		// eslint-disable-next-line
+		[sdk]);
+
 	useEffect(() => {
 		if (isLoaded) {
 			startSDKHere();
 		}
-	}, [isLoaded]);
+	},
+		// eslint-disable-next-line 
+		[isLoaded]);
 	const startSDKHere = () => {
 		addMattertagNode1();
 		initialFunction();
@@ -58,54 +65,65 @@ function AppBundle() {
 			(state) => state.phase === sdk.App.Phase.PLAYING
 		);
 	}
+	function setMessage(element: HTMLDivElement, message: string) {
+		element.classList.remove('hidden');
+		element.classList.add('visible');
+		element.innerText = message;
+	}
+	function clearMesssage(element: HTMLDivElement) {
+		element.classList.remove('visible');
+		element.classList.add('hidden');
+	}
 	const initialFunction = async () => {
-		// const [sceneObject] = await sdk.Scene.createObjects(1);
-		// // add light
-		// const lights = sceneObject.addNode();
-		// lights.addComponent("mp.lights");
-		// lights.start();
-		// // add parrot
-		// const modelNode = sceneObject.addNode();
-		// const parrotComponent = modelNode.addComponent("mp.gltfLoader", {
-		// 	url:
-		// 		"https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/Parrot.glb",
-		// 	localScale: {
-		// 		x: 0.03,
-		// 		y: 0.03,
-		// 		z: 0.03,
-		// 	},
-		// 	localPosition: {
-		// 		x: -32.678383074276525,
-		// 		y: 0.31188817977905303,
-		// 		z: -28.83219463891109,
-		// 	},
-		// 	localRotation: {
-		// 		x: 0,
-		// 		y: 0,
-		// 		z: 0,
-		// 	},
-		// });
-		// class ClickSpy {
-		// 	node = modelNode;
-		// 	component = parrotComponent;
-		// 	eventType = "INTERACTION.CLICK";
-		// 	onEvent(payload) {
-		// 		console.log("received node4", payload, this);
-		// 		console.log(this.component.outputs.objectRoot.scale);
-		// 		alert(parrotComponent.inputs.localPosition.x);
-		// 	}
-		// }
-		// parrotComponent?.spyOnEvent(new ClickSpy());
-		// modelNode.start();
+		const [sceneObject] = await sdk.Scene.createObjects(1);
+		// add light
+		const lights = sceneObject.addNode();
+		lights.addComponent("mp.lights");
+		lights.start();
+		// add parrot
+		const modelNode = sceneObject.addNode();
+		const parrotComponent = modelNode.addComponent("mp.gltfLoader", {
+			url:
+				"https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/Parrot.glb",
+			localScale: {
+				x: 0.03,
+				y: 0.03,
+				z: 0.03,
+			},
+			localPosition: {
+				x: -32.678383074276525,
+				y: 0.31188817977905303,
+				z: -28.83219463891109,
+			},
+			localRotation: {
+				x: 0,
+				y: 0,
+				z: 0,
+			},
+		});
+		class ClickSpy {
+			node = modelNode;
+			component = parrotComponent;
+			eventType = "INTERACTION.CLICK";
+			onEvent(payload) {
+				console.log("received node4", payload, this);
+				console.log(this.component.outputs.objectRoot.scale);
+				alert(parrotComponent.inputs.localPosition.x);
+			}
+		}
+		parrotComponent?.spyOnEvent(new ClickSpy());
+		modelNode.start();
 
 		// const tick = function () {
 		// 	requestAnimationFrame(tick);
+		// 	//modelNode.setAttribute('animation-mixer', 'clip: idle ; timeScale:1')
+		// 	//modelNode.obj3D.setRotationFromAxisAngle(0);
 		// 	modelNode.obj3D.rotation.z += 0.002;
 		// };
 		// tick();
 
 		// add sensor
-		const textElement = document.getElementById("showcase");
+		const textElement = document.getElementById("text");
 		const sensor = await sdk.Sensor.createSensor(sdk.Sensor.SensorType.CAMERA);
 		sensor.showDebug(true);
 		sensor.readings.subscribe({
@@ -127,11 +145,9 @@ function AppBundle() {
 				}
 
 				if (inRange.length > 0) {
-					alert("I am in");
-					console.log("I am in range");
-					textElement.append(`<div>hello</div>`); // setMessage(textElement, "hello");
+					setMessage(textElement, inRange.toString());
 				} else {
-					console.log("I am out of range"); //clearMesssage(textElement);
+					clearMesssage(textElement);
 				}
 			},
 		});
@@ -145,18 +161,6 @@ function AppBundle() {
 		sensor.addSource(...sources);
 	};
 	const addMattertagNode1 = () => {
-		let matterTagDesc = {
-			label: "(1/8) Meet your tour guide!",
-			description: "",
-			anchorPosition: {
-				x: -33.32117261846476,
-				y: 1.1582876760621081,
-				z: -24.18207994942,
-			},
-			stemVector: { x: 0, y: 0.3, z: 0 },
-			mediaType: "video",
-			mediaSrc: "https://youtu.be/6DP3aZY1woQ",
-		};
 		let matterTags = [];
 		hotspots.map((e) => {
 			matterTags.push({
@@ -168,37 +172,60 @@ function AppBundle() {
 					z: e.positionZ,
 				},
 				stemVector: { x: e.stemVectorX, y: e.stemVectorY, z: e.stemVectorZ },
+				mediaType: e.type,
+				mediaSrc: e.url,
 				media: {
-					type: e.type,
+					type: "mattertag.media." + e.type,
 					src: e.url,
-				},
+				}
 			});
-		});
+			return 0;
+		}
+		);
+		// @ts-ignore 
 		sdk.Mattertag.add(matterTags).then(function (mattertagIds) {
 			console.log(mattertagIds);
-		});
+			sdk.Mattertag.getData()
+				.then(function (mattertags) {
+
+					for (let i = 0; i < matterTags.length; i++) {
+						isMobile ? sdk.Mattertag.registerIcon(`${mattertags[i].sid}1`, icon1) : sdk.Mattertag.registerIcon(`${mattertags[i].sid}1`, icon2);
+						sdk.Mattertag.editIcon(mattertags[i].sid, `${mattertags[i].sid}1`);
+					}
+
+				}).catch(function (error) {
+					console.log(error)
+				});
+		})
 	};
+
 	const iframeHandler = () => {
+		// @ts-ignore 
 		setIframe(null);
 	};
 	return (
 		<>
+			<div id="text" className="hidden"></div>
 			<div className='container'>
 				{iframe && (
 					<Iframe
+						// @ts-ignore 
 						title={iframe.title}
+						// @ts-ignore 
 						message={iframe.message}
 						onConfirm={iframeHandler}
 					/>
 				)}
 				<iframe
 					id='showcase'
+					title='showcase_frame'
 					src='/bundle/showcase.html?m=eE6srFdgFSR&play=1&qs=1&log=0&applicationKey=prigk78dz4crrmb7p98czk0kc'
 					width='1200px'
 					height='800px'
 					frameBorder='0'
 					allow='xr-spatial-tracking'
 					allowFullScreen
+					// @ts-ignore 
 					ref={container}
 					onLoad={showCaseLoaded}
 				>

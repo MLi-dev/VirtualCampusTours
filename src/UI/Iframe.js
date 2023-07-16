@@ -16,7 +16,7 @@ const ModalOverlay = (props) => {
         <h2>{props.title}</h2>
       </header>
       <div className={classes.content}>
-        <iframe style={{width:'100%',height:'95%'}} src={props.message}>
+        <iframe title="showcase_frame_1" style={{ width: '100%', height: '95%' }} src={props.message}>
           Your browser does not support inline frames.
         </iframe>
         {/* <p>{props.message}</p> */}
