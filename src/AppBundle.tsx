@@ -1,15 +1,19 @@
+// @ts-nocheck
 import setupSdk from "@matterport/sdk";
 import { useState, useRef, useEffect } from "react";
 import { hotspots } from "./hotspots";
 import Iframe from "./UI/Iframe";
 import "./App.css";
 import sourceDescs from "./sources.json";
+import icon2 from './images/big1.jpg';
+import icon1 from './images/icon1.png';
 
 function AppBundle() {
 	const [sdk, setSdk] = useState();
 	const [isLoaded, setIsLoaded] = useState(false);
 	const [iframe, setIframe] = useState();
 	const container = useRef();
+	const isMobile = window.matchMedia("(min-width: 768px)").matches;
 	let started = false;
 	const showCaseLoaded = async () => {
 		const showcase = document.getElementById("showcase");
@@ -59,50 +63,50 @@ function AppBundle() {
 		);
 	}
 	const initialFunction = async () => {
-		// const [sceneObject] = await sdk.Scene.createObjects(1);
-		// // add light
-		// const lights = sceneObject.addNode();
-		// lights.addComponent("mp.lights");
-		// lights.start();
-		// // add parrot
-		// const modelNode = sceneObject.addNode();
-		// const parrotComponent = modelNode.addComponent("mp.gltfLoader", {
-		// 	url:
-		// 		"https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/Parrot.glb",
-		// 	localScale: {
-		// 		x: 0.03,
-		// 		y: 0.03,
-		// 		z: 0.03,
-		// 	},
-		// 	localPosition: {
-		// 		x: -32.678383074276525,
-		// 		y: 0.31188817977905303,
-		// 		z: -28.83219463891109,
-		// 	},
-		// 	localRotation: {
-		// 		x: 0,
-		// 		y: 0,
-		// 		z: 0,
-		// 	},
-		// });
-		// class ClickSpy {
-		// 	node = modelNode;
-		// 	component = parrotComponent;
-		// 	eventType = "INTERACTION.CLICK";
-		// 	onEvent(payload) {
-		// 		console.log("received node4", payload, this);
-		// 		console.log(this.component.outputs.objectRoot.scale);
-		// 		alert(parrotComponent.inputs.localPosition.x);
-		// 	}
-		// }
-		// parrotComponent?.spyOnEvent(new ClickSpy());
-		// modelNode.start();
+		const [sceneObject] = await sdk.Scene.createObjects(1);
+		// add light
+		const lights = sceneObject.addNode();
+		lights.addComponent("mp.lights");
+		lights.start();
+		// add parrot
+		const modelNode = sceneObject.addNode();
+		const parrotComponent = modelNode.addComponent("mp.gltfLoader", {
+			url:
+				"https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/Parrot.glb",
+			localScale: {
+				x: 0.03,
+				y: 0.03,
+				z: 0.03,
+			},
+			localPosition: {
+				x: -32.678383074276525,
+				y: 0.31188817977905303,
+				z: -28.83219463891109,
+			},
+			localRotation: {
+				x: 0,
+				y: 0,
+				z: 0,
+			},
+		});
+		class ClickSpy {
+			node = modelNode;
+			component = parrotComponent;
+			eventType = "INTERACTION.CLICK";
+			onEvent(payload) {
+				console.log("received node4", payload, this);
+				console.log(this.component.outputs.objectRoot.scale);
+				alert(parrotComponent.inputs.localPosition.x);
+			}
+		}
+		parrotComponent?.spyOnEvent(new ClickSpy());
+		modelNode.start();
 
-		// const tick = function () {
-		// 	requestAnimationFrame(tick);
-		// 	modelNode.obj3D.rotation.z += 0.002;
-		// };
-		// tick();
+		const tick = function () {
+			requestAnimationFrame(tick);
+			modelNode.obj3D.rotation.z += 0.002;
+		};
+		tick();
 
 		// add sensor
 		const textElement = document.getElementById("showcase");
@@ -174,11 +178,26 @@ function AppBundle() {
 				},
 			});
 		});
+		// @ts-ignore 
 		sdk.Mattertag.add(matterTags).then(function (mattertagIds) {
 			console.log(mattertagIds);
-		});
+			sdk.Mattertag.getData()
+				.then(function (mattertags) {
+
+					for (let i = 0; i < matterTags.length; i++) {
+						isMobile ? sdk.Mattertag.registerIcon(`${mattertags[i].sid}1`, icon1) : sdk.Mattertag.registerIcon(`${mattertags[i].sid}1`, icon2);
+						sdk.Mattertag.editIcon(mattertags[i].sid, `${mattertags[i].sid}1`);
+
+					}
+
+				}).catch(function (error) {
+					console.log(error)
+				});
+		})
 	};
+
 	const iframeHandler = () => {
+		// @ts-ignore 
 		setIframe(null);
 	};
 	return (
@@ -186,7 +205,9 @@ function AppBundle() {
 			<div className='container'>
 				{iframe && (
 					<Iframe
+						// @ts-ignore 
 						title={iframe.title}
+						// @ts-ignore 
 						message={iframe.message}
 						onConfirm={iframeHandler}
 					/>
@@ -199,6 +220,7 @@ function AppBundle() {
 					frameBorder='0'
 					allow='xr-spatial-tracking'
 					allowFullScreen
+					// @ts-ignore 
 					ref={container}
 					onLoad={showCaseLoaded}
 				>
