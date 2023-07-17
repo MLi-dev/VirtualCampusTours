@@ -4,8 +4,10 @@ import { hotspots } from "./hotspots";
 import Iframe from "./UI/Iframe";
 import "./App.css";
 import sourceDescs from "./sources.json";
-import icon2 from './images/big1.jpg';
-import icon1 from './images/icon1.png';
+import icon2 from './images/tags/big1.jpg';
+import { getImage } from './scene-components/CustomizeTags.js';
+import Parrots from './assets/Parrot.glb';
+import { url } from "inspector";
 
 function AppBundle() {
 	const [sdk, setSdk] = useState();
@@ -189,7 +191,7 @@ function AppBundle() {
 				.then(function (mattertags) {
 
 					for (let i = 0; i < matterTags.length; i++) {
-						isMobile ? sdk.Mattertag.registerIcon(`${mattertags[i].sid}1`, icon1) : sdk.Mattertag.registerIcon(`${mattertags[i].sid}1`, icon2);
+						isMobile ? sdk.Mattertag.registerIcon(`${mattertags[i].sid}1`, getImage(mattertags[i].label)) : sdk.Mattertag.registerIcon(`${mattertags[i].sid}1`, icon2);
 						sdk.Mattertag.editIcon(mattertags[i].sid, `${mattertags[i].sid}1`);
 					}
 
@@ -198,6 +200,7 @@ function AppBundle() {
 				});
 		})
 	};
+
 
 	const iframeHandler = () => {
 		// @ts-ignore 

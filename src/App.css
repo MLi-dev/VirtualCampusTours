@@ -67,6 +67,8 @@
   position: absolute;
   top: 50px;
   left: 50%;
-  font-size: larger;
+  border: 2px solid;
+  border-color: red;
+  font-size: 30px;
   transform: translateX(-50%);
 }
