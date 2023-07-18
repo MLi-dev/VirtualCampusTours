@@ -68,3 +68,8 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+### Demo 
+Mobile switch icon: Right now, I only found a free number icon which just showcased that when switched to mobile, the discs can be bigger based on user feedback from last time. ![mobile_icon](https://github.com/MLi-dev/VirtualCampusTours/assets/85410877/3d2257f3-948b-4c21-ab59-8bfffd79afed)
+Working with glb model placeholder: We can come up with some sign/tour glbs to help the user engage with tour. ![placeholder_glb_object](https://github.com/MLi-dev/VirtualCampusTours/assets/85410877/80f2d858-6fb6-4c5a-9b0c-d2fa46685c17)
+Important room sensor(You will see a pink area because debug mode is on):  Whenever the user enters an important room, it will trigger a sensor. Right now it shows a banner with the room name. This is based on last time's feedback that important rooms should be emphasized. We can customize this to trigger more events based on the requirements. ![important_room_sensor](https://github.com/MLi-dev/VirtualCampusTours/assets/85410877/56b4e7fc-bad5-42b0-afc4-5afad600de69)
