@@ -9,7 +9,7 @@ import { getImage } from './scene-components/CustomizeTags.js';
 import Parrots from './assets/Parrot.glb';
 import { url } from "inspector";
 
-function AppBundle() {
+function App() {
 	const [sdk, setSdk] = useState();
 	const [isLoaded, setIsLoaded] = useState(false);
 	const [iframe, setIframe] = useState();
@@ -239,4 +239,4 @@ function AppBundle() {
 	);
 }
 
-export default AppBundle;
+export default App;
