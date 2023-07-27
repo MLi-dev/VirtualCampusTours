@@ -4,6 +4,7 @@ import { hotspots } from "./hotspots";
 import Iframe from "./UI/Iframe";
 import "./App.css";
 import sourceDescs from "./sources.json";
+import sweepDesc from "./sweeps.json";
 import icon2 from './images/tags/big1.jpg';
 import { getImage } from './scene-components/CustomizeTags.js';
 import Parrots from './assets/Parrot.glb';
@@ -21,6 +22,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import sourceFont from "./fonts/helvetiker_regular.typeface.json";
 import { geoTextType, makeGeoText } from './scene-components/GeoText';
+import { animation } from '../public/bundle/js/110';
 
 
 
@@ -213,7 +215,7 @@ function AppBundle() {
 			visible: true,
 			size: { x: 1, y: 1, z: 1 },
 			transparent: true,
-			opacity: 0.3,
+			opacity: 1,
 		};
 		const color = randomColor();
 		initObj.color = color;
@@ -239,27 +241,28 @@ function AppBundle() {
 
 	};
 
-	const addIcosahedron = async () => {
+	const addIcosahedron = async (x, y, z, info) => {
+
 		const initObj = {
 			geoType: 'icosahedron',
-			radius: 0.2,
+			radius: 1,
 		};
-		const color = randomColor();
+		const color = randomColor(1, 223 / 255, 0);
 		initObj.color = color;
 		var [sceneObject] = await sdk.Scene.createObjects(1);
 		var node4 = sceneObject.addNode("node-obj-4");
 		const gltfrtv = node4.addComponent(iotBoxType, initObj);
-
+		//makeLight(sceneObject, {}, { x, y: y + 0.8, z });
 		class ClickSpy {
 			node = node4;
 			component = gltfrtv;
-			eventType = "INTERACTION.CLICK";
-			onEvent(payload) {
-				alert(this.component.outputs.objectRoot.position.x + "," + this.component.outputs.objectRoot.position.y + "," + this.component.outputs.objectRoot.position.z);
-				customEvent(this.component.inputs.myUpdatedHexColor);
+			eventType = "INTERACTION.HOVER";
+			onEvent(eventType, payload) {
+				alert(info.name);
+				alert("click anywhere near the sign to go to the room");
 			}
 		}
-		node4.position.set(-31.678383074276525, 1.3582876760621081, -24.83219463891109);
+		node4.position.set(x, y, z);
 		gltfrtv?.spyOnEvent(new ClickSpy());
 
 		//setComponentIotBox(gltfrtv);
@@ -283,7 +286,7 @@ function AppBundle() {
 			transparent: true,
 			opacity: 0.5
 		};
-		const color = randomColor(135 / 255, 206 / 255, 235 / 255);
+		const color = randomColor(255 / 255, 223 / 255, 235 / 255);
 		initObj.color = color;
 		var [sceneObject] = await sdk.Scene.createObjects(1);
 		var node4 = sceneObject.addNode("node-obj-4");
@@ -534,10 +537,7 @@ function AppBundle() {
 		tick();
 
 	};
-
-	const initialFunction = async () => {
-		registerCustomComponent();
-		const [sceneObject] = await sdk.Scene.createObjects(1);
+	const makeLight = (sceneObject, color, position) => {
 		// add light
 		const lightsNode = sceneObject.addNode();
 		const directionalLightComponet = lightsNode.addComponent(
@@ -549,35 +549,66 @@ function AppBundle() {
 
 		const ambientLightComponet = lightsNode.addComponent("mp.ambientLight", {
 			intensity: 0.5,
-			color: { r: 1.0, g: 0, b: 0 },
+			// color: { r: 1.0, g: 0, b: 0 },
 		});
 		const ambientIntensityPath = sceneObject.addInputPath(
 			ambientLightComponet,
 			"intensity",
 			"ambientIntensity"
 		);
-		lightsNode.position.set(-38.678383074276525, 2, -22.83219463891109);
-		// let intensity = 1;
-		// const intensityMax = 2;
-		// const intensityMin = 0.1;
-		// const intensityDelta = 0.02;
-		// let intensityDirection = 1;
-		// setInterval(() => {
-		// 	intensity += (intensityDelta * intensityDirection);
+		lightsNode.position.set(position.x, position.y, position.z);
+		let intensity = 1;
+		const intensityMax = 2;
+		const intensityMin = 0.1;
+		const intensityDelta = 0.008;
+		let intensityDirection = 1;
+		setInterval(() => {
+			intensity += (intensityDelta * intensityDirection);
 
-		// 	if (intensity >= intensityMax) {
-		// 		intensity = intensityMax;
-		// 		intensityDirection = intensityDirection * -1;
-		// 	}
-		// 	else if (intensity <= intensityMin) {
-		// 		intensity = intensityMin;
-		// 		intensityDirection = intensityDirection * -1;
-		// 	}
+			if (intensity >= intensityMax) {
+				intensity = intensityMax;
+				intensityDirection = intensityDirection * -1;
+			}
+			else if (intensity <= intensityMin) {
+				intensity = intensityMin;
+				intensityDirection = intensityDirection * -1;
+			}
 
-		// 	// The path can be used as the public interface to the component behaviors contained within the scene object.
-		// 	ambientIntensityPath.set(intensity);
-		// }, 15);
+			// The path can be used as the public interface to the component behaviors contained within the scene object.
+			ambientIntensityPath.set(intensity);
+		}, 15);
 		lightsNode.start();
+	}
+
+	const initialFunction = async () => {
+		registerCustomComponent();
+		const [sceneObject] = await sdk.Scene.createObjects(1);
+
+		makeLight(sceneObject, {}, { x: -38.678383074276525, y: 2, z: -22.83219463891109 });
+		const sweepGraph = await sdk.Sweep.createGraph();
+		for (const desc of sweepDesc) {
+			addIcosahedron(desc.position.x, desc.position.y + 2.5, desc.position.z, desc);
+		}
+		// const startSweep = sweepGraph.vertex("612abc1d8ac449e68ea69f2304e16e56");
+		// const endSweep = sweepGraph.vertex("fbafa1d664444e77b09bb5ae194451a8");
+
+		// const aStarRunner = sdk.Graph.createAStarRunner(sweepGraph, startSweep, endSweep);
+		// const result = aStarRunner.exec();
+		// const path = result.path;
+		// path.map((e) => {
+		// 	//-31.678383074276525, 1.3582876760621081, -24.83219463891109
+		// 	addIcosahedron(e.data.position.x, e.data.position.y + 2.5, e.data.position.z, e.data.id);
+		// 	return 0;
+		// }
+		// );
+
+		// aStarRunner.subscribe({
+		// 	onChanged(runner) {
+		// 		console.log('sweep graph has changed');
+		// 	}
+		// });
+
+
 		// addComponentNode4();
 		// addCube();
 		// addSphere();
@@ -589,74 +620,93 @@ function AppBundle() {
 		addPath();
 
 
-		// add parrot
-		// const modelNode = sceneObject.addNode();
-		// let initial = {
-		// 	//url: "https://static.matterport.com/showcase-sdk/examples/assets-1.0-2-g6b74572/assets/models/sofa/9/scene.gltf",
-		// 	visible: true,
-		// 	size: { x: 0.6, y: 0.6, z: 0.6 },
-		// 	localScale: {
-		// 		x: 1,
-		// 		y: 1,
-		// 		z: 1,
-		// 	},
-		// 	localPosition: {
-		// 		x: -32.678383074276525,
-		// 		y: 0.31188817977905303,
-		// 		z: -28.83219463891109,
-		// 	},
-		// 	localRotation: {
-		// 		x: 0,
-		// 		y: 0,
-		// 		z: 0,
-		// 	},
+		//add parrot
+		const modelNode = sceneObject.addNode();
+		let initial = {
+			//url: "https://static.matterport.com/showcase-sdk/examples/assets-1.0-2-g6b74572/assets/models/sofa/9/scene.gltf",
+			visible: true,
+			size: { x: 0.6, y: 0.6, z: 0.6 },
+			localScale: {
+				x: 1,
+				y: 1,
+				z: 1,
+			},
+			localPosition: {
+				x: -32.678383074276525,
+				y: 0.31188817977905303,
+				z: -28.83219463891109,
+			},
+			localRotation: {
+				x: 0,
+				y: 0,
+				z: 0,
+			},
 
-		// 	/*  position: { x: -1, y: -7.5, z: 2.25 }, */
-		// };
-		// const parrotComponent = modelNode.addComponent(
-		// 	boxFactoryType,
-		// 	initial
-		// );
-		// const parrotComponent = modelNode.addComponent("mp.gltfLoader", {
-		// 	url:
-		// 		"https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/Parrot.glb",
-		// 	localScale: {
-		// 		x: 0.03,
-		// 		y: 0.03,
-		// 		z: 0.03,
-		// 	},
-		// 	localPosition: {
-		// 		x: -32.678383074276525,
-		// 		y: 0.31188817977905303,
-		// 		z: -28.83219463891109,
-		// 	},
-		// 	localRotation: {
-		// 		x: 0,
-		// 		y: 0,
-		// 		z: 0,
-		// 	},
-		// });
-		// class ClickSpy {
-		// 	node = modelNode;
-		// 	component = parrotComponent;
-		// 	eventType = "INTERACTION.CLICK";
-		// 	onEvent(payload) {
-		// 		console.log("received node4", payload, this);
-		// 		console.log(this.component.outputs.objectRoot.scale);
-		// 		alert(parrotComponent.inputs.localPosition.x);
-		// 	}
-		// }
-		// parrotComponent?.spyOnEvent(new ClickSpy());
-		// modelNode.start();
+			/*  position: { x: -1, y: -7.5, z: 2.25 }, */
+		};
+		const parrotComponent = modelNode.addComponent("mp.objLoader", {
+			url:
+				"https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/obj/female02/female02.obj",
+			// localScale: {
+			// 	x: 0.007,
+			// 	y: 0.007,
+			// 	z: 0.007,
+			// },
+			// localPosition: {
+			// 	x: -32.678383074276525,
+			// 	y: 0.30188817977905303,
+			// 	z: -27.83219463891109,
+			// },
+			// localRotation: {
+			// 	x: 0,
+			// 	y: 0,
+			// 	z: 0,
+			// },
+		});
+		parrotComponent.inputs.localScale = {
+			x: 0.01,
+			y: 0.01,
+			z: 0.01
+		};
 
+		class ClickSpy {
+			node = modelNode;
+			component = parrotComponent;
+			eventType = "INTERACTION.CLICK";
+			onEvent(payload) {
+				console.log("received node4", payload, this);
+				console.log(this.component.outputs.objectRoot.scale);
+				//alert(parrotComponent.inputs.localPosition.x);
+				setTimeout(function () {
+					modelNode.obj3D.position.set(-30.878383074276525,
+						0.3,
+						-25.18207994942);
+				}, 0);
+				setTimeout(function () {
+					modelNode.obj3D.position.set(-30.878383074276525,
+						0.18,
+						-25.18207994942);
+				}, 100);
+
+
+			}
+		}
+		modelNode.obj3D.position.set(-30.878383074276525,
+			0.18,
+			-25.18207994942);
+		parrotComponent?.spyOnEvent(new ClickSpy());
+		modelNode.obj3D.rotation.y += 10;
+		//modelNode.obj3D.rotation.y = -Math.PI;
+		modelNode.start();
 		// const tick = function () {
 		// 	requestAnimationFrame(tick);
-		// 	//modelNode.setAttribute('animation-mixer', 'clip: idle ; timeScale:1')
-		// 	//modelNode.obj3D.setRotationFromAxisAngle(0);
-		// 	modelNode.obj3D.rotation.z += 0.002;
-		// 	mesh.rotation.x -= props.torusSpeed;
-		// 	mesh.rotation.y += props.torusSpeed;
-		// 	mesh.rotation.z -= props.torusSpeed;
+		// 	//modelNode.obj3D.setAttribute('animation-mixer', 'clip: idle ; timeScale:1')
+		// 	//modelNode.obj3D.setRotationFromAxisAngle(-Math.PI);
+		// 	modelNode.obj3D.rotation.y += 0.002;
+		// 	// 	// mesh.rotation.x -= props.torusSpeed;
+		// 	// 	// mesh.rotation.y += props.torusSpeed;
+		// 	// 	// mesh.rotation.z -= props.torusSpeed;
+		// 	// 	modelNode.obj3D.rotation.y += 0.002;
 		// };
 		// tick();
 

@@ -85,13 +85,13 @@ function IotBox() {
     const torusKnotGeometry = getGeo(THREE, geoType, { radius, tube, tSeg, rSeg, p, q, width, height, depth, wSeg, hSeg, innerRadius, outerRadius, font });
     this.torusKnotGeometry = torusKnotGeometry;
     this.geoType = geoType;
-    const texture = new THREE.TextureLoader().load(`/images/tags/path.png`);
+
     const torusKnotMat = new THREE.MeshStandardMaterial({
       color,
       roughness,
       transparent,
       opacity,
-      map: texture
+      // map: texture
     });
     let mesh;
     if (geoType === "circle") {
@@ -99,6 +99,8 @@ function IotBox() {
       mesh.rotation.x = - Math.PI / 2;
       mesh.rotation.z = - Math.PI / 2;
     } else if (geoType === "ring") {
+      const texture = new THREE.TextureLoader().load(`/images/tags/path.png`);
+      torusKnotMat.map = texture;
       mesh = new THREE.Mesh(torusKnotGeometry, torusKnotMat);
       mesh.rotation.x = - Math.PI / 2;
       mesh.rotation.z = - Math.PI / 2;
@@ -120,6 +122,13 @@ function IotBox() {
   };
 
   this.onEvent = function (type, data) {
+    if (type === "INTERACTION.HOVER") {
+      this.notify("INTERACTION.HOVER", {
+        type: type,
+        node: this.context.root,
+        component: this,
+      });
+    }
     if (type === "INTERACTION.CLICK") {
       this.notify("INTERACTION.CLICK", {
         type: type,
@@ -127,7 +136,7 @@ function IotBox() {
         component: this,
       });
     }
-    console.log(type, data);
+    console.log("***********************************");
   };
 
   this.onInputsUpdated = function (previous) {
