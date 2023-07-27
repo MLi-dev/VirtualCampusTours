@@ -72,3 +72,10 @@
   font-size: 30px;
   transform: translateX(-50%);
 }
+
+#sound {
+  position: absolute;
+  top: 50px;
+  left: 95%;
+  transform: translateX(-50%);
+}
