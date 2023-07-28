@@ -69,7 +69,6 @@ function GeoText() {
     const texture = new THREE.TextureLoader().load(`/images/tags/${image}`);
     var mat = new THREE.MeshBasicMaterial({
       transparent: true,
-      size: 0.1,
       opacity: 1,
       depthTest: false,
       depthWrite: false,

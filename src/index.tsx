@@ -4,6 +4,7 @@ import "./index.css";
 import AppBundle from "./AppBundle";
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap.js';
+import 'ionicons/dist/ionicons.js';
 
 // @ts-ignore 
 const root = ReactDOMCLIENT.createRoot(document.getElementById("root"));

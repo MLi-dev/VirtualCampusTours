@@ -7,22 +7,10 @@ import sourceDescs from "./sources.json";
 import sweepDesc from "./sweeps.json";
 import icon2 from './images/tags/big1.jpg';
 import { getImage } from './scene-components/CustomizeTags.js';
-import Parrots from './assets/Parrot.glb';
-import { url } from "inspector";
-import Player from "./scene-components/MusicPlayer"
-import { boxFactoryType, makeBoxFactory } from "./scene-components/SimpleBox";
 import { iotBoxType, makeIotBox } from "./scene-components/IotBox";
-import { troikaTextType, makeTroikaText } from "./scene-components/TroikaText";
-import { Text } from 'troika-three-text'
-import { initializeSceneControls } from './scene-components/scene-controls';
-import { intializeRendererControls } from './scene-components/renderer-control';
 import { randomColor } from './util/colorUtil';
-import { font_text } from './scene-components/text';
-import { FontLoader } from 'three/addons/loaders/FontLoader.js';
-import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import sourceFont from "./fonts/helvetiker_regular.typeface.json";
 import { geoTextType, makeGeoText } from './scene-components/GeoText';
-import { animation } from '../public/bundle/js/110';
 
 
 
@@ -89,15 +77,52 @@ function AppBundle() {
 		element.classList.add('visible');
 		element.innerText = message;
 	}
-	function setSound(element: HTMLDivElement) {
-		element.classList.remove('hidden');
-		element.classList.add('visible');
-		element.firstElementChild.url = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
-		//element.innerHTML = <Player url="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" />
+	function setSound(element: HTMLDivElement, message: string) {
+		if (message === "Film Classroom") {
+			const button = document.querySelector("#sound");
+			const audio = document.querySelector("audio");
+			button.classList.remove('hidden');
+			button.classList.add('visible');
+			audio.volume = 0.1;
+			audio.play();
+			button.addEventListener("click", () => {
+				if (audio.paused) {
+					audio.volume = 0.1;
+					audio.play();
+					button.innerText = "Pause";
+
+				} else {
+					audio.pause();
+					button.innerText = "Play";
+				}
+			});
+		}
 	}
-	function clearSound(element: HTMLDivElement, message: string) {
+	function clearSound(element: HTMLDivElement) {
 		element.classList.remove('visible');
 		element.classList.add('hidden');
+		const audio = document.querySelector("audio");
+		audio.pause();
+	}
+	function handleMusic(e) {
+		const button = document.querySelector("#button");
+		const icon = document.querySelector("#button > i");
+		const audio = document.querySelector("audio");
+
+		button.addEventListener("click", () => {
+			if (audio.paused) {
+				audio.volume = 0.2;
+				audio.play();
+				icon.classList.remove('fa-volume-up');
+				icon.classList.add('fa-volume-mute');
+
+			} else {
+				audio.pause();
+				icon.classList.remove('fa-volume-mute');
+				icon.classList.add('fa-volume-up');
+			}
+			button.classList.add("fade");
+		});
 	}
 	function clearMesssage(element: HTMLDivElement) {
 		element.classList.remove('visible');
@@ -138,7 +163,6 @@ function AppBundle() {
 			p: 3,
 			q: 7,
 			visible: true,
-			size: { x: 1, y: 1, z: 1 },
 		};
 		const color = randomColor();
 		initObj.color = color;
@@ -151,7 +175,6 @@ function AppBundle() {
 			eventType = "INTERACTION.CLICK";
 			onEvent(payload) {
 				alert(this.component.outputs.objectRoot.scale);
-				customEvent(this.component.inputs.myUpdatedHexColor);
 			}
 		}
 		node4.position.set(-32.678383074276525, 1.9582876760621081, -24.83219463891109);
@@ -175,7 +198,6 @@ function AppBundle() {
 			width: 0.5,
 			height: 0.5,
 			visible: true,
-			size: { x: 1, y: 1, z: 1 },
 		};
 		const color = randomColor();
 		initObj.color = color;
@@ -189,7 +211,6 @@ function AppBundle() {
 			eventType = "INTERACTION.CLICK";
 			onEvent(payload) {
 				alert(this.component.outputs.objectRoot.position.x + "," + this.component.outputs.objectRoot.position.y + "," + this.component.outputs.objectRoot.position.z);
-				customEvent(this.component.inputs.myUpdatedHexColor);
 			}
 		}
 		node4.position.set(-34.678383074276525, 1.8582876760621081, -24.83219463891109);
@@ -213,7 +234,6 @@ function AppBundle() {
 			geoType: 'circle',
 			radius: 0.3,
 			visible: true,
-			size: { x: 1, y: 1, z: 1 },
 			transparent: true,
 			opacity: 1,
 		};
@@ -229,7 +249,6 @@ function AppBundle() {
 			eventType = "INTERACTION.CLICK";
 			onEvent(payload) {
 				alert(this.component.outputs.objectRoot.position.x + "," + this.component.outputs.objectRoot.position.y + "," + this.component.outputs.objectRoot.position.z);
-				customEvent(this.component.inputs.myUpdatedHexColor);
 			}
 		}
 		node4.position.set(x, y, z);
@@ -256,10 +275,9 @@ function AppBundle() {
 		class ClickSpy {
 			node = node4;
 			component = gltfrtv;
-			eventType = "INTERACTION.HOVER";
+			eventType = "INTERACTION.CLICK";
 			onEvent(eventType, payload) {
-				alert(info.name);
-				alert("click anywhere near the sign to go to the room");
+				window.prompt(info.name);
 			}
 		}
 		node4.position.set(x, y, z);
@@ -298,7 +316,6 @@ function AppBundle() {
 			eventType = "INTERACTION.CLICK";
 			onEvent(payload) {
 				alert(this.component.outputs.objectRoot.position.x + "," + this.component.outputs.objectRoot.position.y + "," + this.component.outputs.objectRoot.position.z);
-				customEvent(this.component.inputs.myUpdatedHexColor);
 			}
 		}
 		node4.position.set(x, y, z);
@@ -333,7 +350,6 @@ function AppBundle() {
 			eventType = "INTERACTION.CLICK";
 			onEvent(payload) {
 				alert(this.component.outputs.objectRoot.position.x + "," + this.component.outputs.objectRoot.position.y + "," + this.component.outputs.objectRoot.position.z);
-				customEvent(this.component.inputs.myUpdatedHexColor);
 			}
 		}
 		node4.position.set(-34.678383074276525, 0.1582876760621081, -25.83219463891109);
@@ -493,21 +509,19 @@ function AppBundle() {
 
 	};
 
-	const addSphere = async () => {
+	const addSphere = async (x, y, z, info, color) => {
 		const initObj = {
 			geoType: 'sphere',
-			radius: 0.2,
+			radius: 1,
 			wSeg: 32,
 			hSeg: 16,
 			visible: true,
-			size: { x: 1, y: 1, z: 1 },
 			updateInterval: 1000,
 			currentTime: 0,
 			nextUpdate: 0,
 			updateApiUrl: "",
 			myUpdatedHexColor: "",
 		};
-		const color = randomColor();
 		initObj.color = color;
 		var [sceneObject] = await sdk.Scene.createObjects(1);
 		var node4 = sceneObject.addNode("node-obj-4");
@@ -518,12 +532,17 @@ function AppBundle() {
 			component = gltfrtv;
 			eventType = "INTERACTION.CLICK";
 			onEvent(payload) {
-				alert(this.component.outputs.objectRoot.position.x + "," + this.component.outputs.objectRoot.position.y + "," + this.component.outputs.objectRoot.position.z);
-				customEvent(this.component.inputs.myUpdatedHexColor);
+				const textElement = document.getElementById("text");
+				setMessage(textElement, info.name)
+				setTimeout(function () {
+					clearMesssage(textElement)
+				}, 5000);
+
 			}
 		}
-		node4.position.set(-36.678383074276525, 1.3582876760621081, -24.83219463891109);
+		node4.position.set(x, y, z);
 		gltfrtv?.spyOnEvent(new ClickSpy());
+
 
 		//setComponentIotBox(gltfrtv);
 		node4.start();
@@ -583,12 +602,21 @@ function AppBundle() {
 	const initialFunction = async () => {
 		registerCustomComponent();
 		const [sceneObject] = await sdk.Scene.createObjects(1);
-
 		makeLight(sceneObject, {}, { x: -38.678383074276525, y: 2, z: -22.83219463891109 });
-		const sweepGraph = await sdk.Sweep.createGraph();
+		let color = randomColor(1, 223 / 255, 0);
 		for (const desc of sweepDesc) {
-			addIcosahedron(desc.position.x, desc.position.y + 2.5, desc.position.z, desc);
+			addSphere(desc.position.x, desc.position.y + 5, desc.position.z, desc, color);
 		}
+		// sdk.Sweep.current.subscribe(function (currentSweep) {
+		// 	// Change to the current sweep has occurred.
+		// 	if (currentSweep.sid === '') {
+		// 		console.log('Not currently stationed at a sweep position');
+		// 	} else {
+		// 		color = randomColor(66 / 255, 165 / 255, 245 / 255);
+		// 		addSphere(currentSweep.position.x, currentSweep.position.y + 5, currentSweep.position.z, { id: currentSweep.sid }, color);
+		// 	}
+		// });
+		// const sweepGraph = await sdk.Sweep.createGraph();
 		// const startSweep = sweepGraph.vertex("612abc1d8ac449e68ea69f2304e16e56");
 		// const endSweep = sweepGraph.vertex("fbafa1d664444e77b09bb5ae194451a8");
 
@@ -622,46 +650,10 @@ function AppBundle() {
 
 		//add parrot
 		const modelNode = sceneObject.addNode();
-		let initial = {
-			//url: "https://static.matterport.com/showcase-sdk/examples/assets-1.0-2-g6b74572/assets/models/sofa/9/scene.gltf",
-			visible: true,
-			size: { x: 0.6, y: 0.6, z: 0.6 },
-			localScale: {
-				x: 1,
-				y: 1,
-				z: 1,
-			},
-			localPosition: {
-				x: -32.678383074276525,
-				y: 0.31188817977905303,
-				z: -28.83219463891109,
-			},
-			localRotation: {
-				x: 0,
-				y: 0,
-				z: 0,
-			},
 
-			/*  position: { x: -1, y: -7.5, z: 2.25 }, */
-		};
 		const parrotComponent = modelNode.addComponent("mp.objLoader", {
 			url:
 				"https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/obj/female02/female02.obj",
-			// localScale: {
-			// 	x: 0.007,
-			// 	y: 0.007,
-			// 	z: 0.007,
-			// },
-			// localPosition: {
-			// 	x: -32.678383074276525,
-			// 	y: 0.30188817977905303,
-			// 	z: -27.83219463891109,
-			// },
-			// localRotation: {
-			// 	x: 0,
-			// 	y: 0,
-			// 	z: 0,
-			// },
 		});
 		parrotComponent.inputs.localScale = {
 			x: 0.01,
@@ -698,17 +690,6 @@ function AppBundle() {
 		modelNode.obj3D.rotation.y += 10;
 		//modelNode.obj3D.rotation.y = -Math.PI;
 		modelNode.start();
-		// const tick = function () {
-		// 	requestAnimationFrame(tick);
-		// 	//modelNode.obj3D.setAttribute('animation-mixer', 'clip: idle ; timeScale:1')
-		// 	//modelNode.obj3D.setRotationFromAxisAngle(-Math.PI);
-		// 	modelNode.obj3D.rotation.y += 0.002;
-		// 	// 	// mesh.rotation.x -= props.torusSpeed;
-		// 	// 	// mesh.rotation.y += props.torusSpeed;
-		// 	// 	// mesh.rotation.z -= props.torusSpeed;
-		// 	// 	modelNode.obj3D.rotation.y += 0.002;
-		// };
-		// tick();
 
 		// add sensor
 		const textElement = document.getElementById("text");
@@ -732,10 +713,9 @@ function AppBundle() {
 						`sensor id: ${source.userData.id} inRange:${reading.inRange} inView:${reading.inView}`
 					);
 				}
-
 				if (inRange.length > 0) {
 					setMessage(textElement, inRange.toString());
-					setSound(soundElement)
+					setSound(soundElement, inRange.toString());
 				} else {
 					clearMesssage(textElement);
 					clearSound(soundElement);
@@ -780,8 +760,8 @@ function AppBundle() {
 				.then(function (mattertags) {
 
 					for (let i = 0; i < matterTags.length; i++) {
-						isMobile ? sdk.Mattertag.registerIcon(`${mattertags[i].sid}1`, getImage(mattertags[i].label)) : sdk.Mattertag.registerIcon(`${mattertags[i].sid}1`, icon2);
-						sdk.Mattertag.editIcon(mattertags[i].sid, `${mattertags[i].sid}1`);
+						isMobile ? sdk.Asset.registerTexture(`${mattertags[i].sid}1`, getImage(mattertags[i].label)) : sdk.Mattertag.registerIcon(`${mattertags[i].sid}1`, icon2);
+						sdk.Tag.editIcon(mattertags[i].sid, `${mattertags[i].sid}1`);
 					}
 
 				}).catch(function (error) {
@@ -797,7 +777,11 @@ function AppBundle() {
 	};
 	return (
 		<>
-			<div id="sound" className="hidden"><Player url="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" /></div>
+			<audio loop src="https://cdn.videvo.net/videvo_files/audio/premium/audio0071/watermarked/CrowdTalking%201010_50_preview.mp3"></audio>
+			<button id="sound" className="hidden btn btn-primary">
+				<ion-icon name="volume-mute-outline"></ion-icon>
+				Pause
+			</button>
 			<div id="text" className="hidden"></div>
 			<div className='container'>
 				{iframe && (
@@ -812,7 +796,7 @@ function AppBundle() {
 				<iframe
 					id='showcase'
 					title='showcase_frame'
-					src='/bundle/showcase.html?m=eE6srFdgFSR&play=1&qs=1&log=0&applicationKey=prigk78dz4crrmb7p98czk0kc&mdir=2'
+					src='/bundle/showcase.html?m=eE6srFdgFSR&help=1&play=0&qs=1&log=0&tour=3&hr=1&pin=0&hl=1&&title=1&&applicationKey=prigk78dz4crrmb7p98czk0kc&mdir=2'
 					width='1200px'
 					height='800px'
 					frameBorder='0'

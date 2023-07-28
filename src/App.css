@@ -79,3 +79,13 @@
   left: 95%;
   transform: translateX(-50%);
 }
+
+.fa_custom {
+  color:
+    #0099CC
+}
+
+#play-prompt {
+  font-size: 30px !important;
+
+}

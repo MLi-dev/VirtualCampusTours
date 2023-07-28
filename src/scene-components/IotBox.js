@@ -21,7 +21,6 @@ function IotBox() {
     innerRadius: 0.2,
     outerRadius: 0.4,
     visible: true,
-    size: { x: 1, y: 1, z: 1 },
     color: { r: 0, g: 1, b: 0 },
     roughness: 0.1,
     updateInterval: 1000,
@@ -39,14 +38,6 @@ function IotBox() {
     "INTERACTION.CLICK": true,
     "INTERACTION.HOVER": true,
   };
-
-  const getText = async () => {
-    let font = await new FontLoader().loadAsync('/fonts/helvetiker_regular.typeface.json');
-    return new TextGeometry('Some Text', {
-      font: font,
-      size: 2
-    })
-  }
 
   const getGeo = function (THREE, type, input) {
     if (type === "torusKnot")
@@ -72,9 +63,6 @@ function IotBox() {
       heartShape.bezierCurveTo(x + 16, y + 7, x + 16, y, x + 10, y);
       heartShape.bezierCurveTo(x + 7, y, x + 5, y + 5, x + 5, y + 5);
       return new THREE.ShapeGeometry(heartShape).scale(0.02, 0.02, 0.02);
-    } else {
-      const textObj = getText().then((obj) => obj);
-      //return textObj;
     }
   }
 
@@ -129,6 +117,13 @@ function IotBox() {
         component: this,
       });
     }
+    if (type === "INTERACTION.POINTER_MOVE") {
+      this.notify("INTERACTION.POINTER_MOVE", {
+        type: type,
+        node: this.context.root,
+        component: this,
+      });
+    }
     if (type === "INTERACTION.CLICK") {
       this.notify("INTERACTION.CLICK", {
         type: type,
@@ -149,7 +144,7 @@ function IotBox() {
       this.torusKnotGeometry.rotateY += 1;
       this.torusKnotGeometry.rotateZ += 1;
     }
-    else if (this.geoType !== "ring") {
+    else if (this.geoType !== "ring" && this.geoType !== "sphere") {
       // this.torusKnotGeometry.rotateX += 0.01;
       // this.torusKnotGeometry.rotateY += 0.01;
       // this.torusKnotGeometry.rotateZ += 0.01;
